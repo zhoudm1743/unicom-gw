@@ -67,10 +67,15 @@ func (c *DefaultIoTGatewayClient) doPost(request IoTGatewayRequest) (string, err
 	params["app_secrect"] = c.AppSecret
 
 	// 构建应用参数
-	_, err := utils.BuildAppParams(params)
+	tokenInfo, err := utils.BuildAppParams(params)
 	if err != nil {
 		return "", err
 	}
+
+	// 确保token信息被正确应用到params中
+	params["token"] = tokenInfo["token"]
+	params["timestamp"] = tokenInfo["timestamp"]
+	params["trans_id"] = tokenInfo["trans_id"]
 
 	reqParams := request.GetParams()
 	params["data"] = reqParams

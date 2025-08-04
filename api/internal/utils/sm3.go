@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"log"
 	"math"
 	"math/big"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -261,19 +263,37 @@ func MakeToken(appID, appSecret string) (map[string]interface{}, error) {
 	// 获取时间戳格式化字符串
 	timestamp := getFormatedDateString(8)
 
-	// 生成transId
-	transID := timestamp
-	transID = strconv.FormatInt(time.Now().UnixNano(), 10)
+	// 生成transId：移除时间戳中的特殊字符并添加随机数，与Java版本保持一致
+	transID := strings.ReplaceAll(timestamp, "-", "")
+	transID = strings.ReplaceAll(transID, " ", "")
+	transID = strings.ReplaceAll(transID, ":", "")
+	transID = strings.ReplaceAll(transID, ".", "") // 去掉毫秒中的点
+
+	// 生成一个6位随机数
+	randNum, err := rand.Int(rand.Reader, big.NewInt(999999))
+	if err != nil {
+		return nil, err
+	}
+	transID = fmt.Sprintf("%s%06d", transID, randNum.Int64())
+
+	// 打印关键信息用于调试
+	fmt.Printf("生成签名信息:\nappID: %s\ntimestamp: %s\ntransID: %s\nappSecret: %s\n",
+		appID, timestamp, transID, appSecret)
 
 	// 构建签名字符串
 	sb := fmt.Sprintf("app_id%stimestamp%strans_id%s%s",
 		appID, timestamp, transID, appSecret)
+
+	// 打印完整签名字符串用于调试
+	fmt.Printf("签名字符串: %s\n", sb)
 
 	// 计算SM3摘要
 	token, err := SM3Encode(sb, "UTF-8")
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("生成token: %s\n", token)
 
 	result["token"] = token
 	result["timestamp"] = timestamp
@@ -284,18 +304,32 @@ func MakeToken(appID, appSecret string) (map[string]interface{}, error) {
 
 // BuildAppParams 构建应用参数
 func BuildAppParams(params map[string]interface{}) (map[string]interface{}, error) {
-	appID := params["app_id"].(string)
-	appSecret := params["app_secrect"].(string)
+	if params == nil {
+		return nil, errors.New("参数不能为空")
+	}
+
+	appID, ok := params["app_id"].(string)
+	if !ok || appID == "" {
+		return nil, errors.New("app_id不能为空")
+	}
+
+	appSecret, ok := params["app_secrect"].(string)
+	if !ok || appSecret == "" {
+		return nil, errors.New("app_secrect不能为空")
+	}
 
 	result, err := MakeToken(appID, appSecret)
 	if err != nil {
 		return nil, err
 	}
 
+	// 更新传入的params参数
 	params["token"] = result["token"]
 	params["trans_id"] = result["trans_id"]
 	params["timestamp"] = result["timestamp"]
 	delete(params, "app_secrect")
+
+	fmt.Printf("BuildAppParams 结果: %+v\n", params)
 
 	return result, nil
 }
@@ -317,8 +351,15 @@ func getFormatedDateString(timeZoneOffset float64) string {
 	location := time.FixedZone("Custom", offsetHours*3600+offsetMinutes*60)
 	now = now.In(location)
 
-	// 格式化时间
-	return now.Format("2006-01-02 15:04:05.000")
+	// 格式化时间，确保与Java一致
+	// Java的SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS")会产生类似"2023-08-04 12:34:56 789"的格式
+	// 注意毫秒后有空格而不是点
+	year, month, day := now.Date()
+	hour, min, sec := now.Clock()
+	millis := now.Nanosecond() / 1000000
+
+	return fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d %03d",
+		year, month, day, hour, min, sec, millis)
 }
 
 // GenerateRandomNumber 生成指定位数的随机数字字符串

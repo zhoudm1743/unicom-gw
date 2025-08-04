@@ -50,22 +50,34 @@ func SetIgnoreHostCheck(ignore bool) {
 
 // DoPost 执行HTTP POST请求
 func DoPost(serverURL string, apiName string, apiVersion string, reqText string, connectTimeout time.Duration, readTimeout time.Duration, retryCount int) (string, error) {
-	// 构建URL路径
+	// 构建URL路径，精确匹配Java版本
 	if !strings.HasSuffix(serverURL, "/") {
 		serverURL += "/"
 	}
+
+	// 处理API名称，如果以cn.开头则移除
 	if strings.HasPrefix(apiName, "cn.") {
 		apiName = apiName[3:]
 	}
-	serverURL += strings.ReplaceAll(apiName, ".", "/")
-	serverURL += "/v" + apiVersion
+
+	// Java版本是用replaceAll("\\.", "/")，但我们不需要替换，因为输入的apiName已经是正确格式
+	// 直接使用apiName而不替换点号为斜杠
+
+	// 构建完整URL
+	fullURL := serverURL + apiName
+
+	// 添加版本号，Java版本是加 /v + 版本号
+	fullURL += "/v" + apiVersion
+
+	fmt.Printf("构建的URL: %s\n", fullURL)
+	fmt.Printf("请求参数: %s\n", reqText)
 
 	// 构建请求内容类型和请求体
 	ctype := "application/json;charset=" + DEFAULT_CHARSET
 	reqBody := []byte(reqText)
 
 	// 执行POST请求
-	return doPost(serverURL, ctype, reqBody, connectTimeout, readTimeout, retryCount)
+	return doPost(fullURL, ctype, reqBody, connectTimeout, readTimeout, retryCount)
 }
 
 // DoPostWithParams 使用参数执行HTTP POST请求
@@ -136,6 +148,7 @@ func performPost(url string, contentType string, reqBody []byte, connectTimeout 
 	if err != nil {
 		return "", err
 	}
+	fmt.Println(fmt.Sprintf("请求地址：%s\n请求参数：%s", req.URL.String(), string(reqBody)))
 
 	// 设置请求头
 	req.Header.Set("Content-Type", contentType)
