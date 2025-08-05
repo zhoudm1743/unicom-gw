@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// 创建客户端实例
-	client := api.NewIoTGatewayClient("https://gwapi.10646.cn/api/", "azjJ2DKEhQ", "c8P00UiFwiBqHHWxU1iSV1ok0iCwUY")
+	client := api.NewIoTGatewayClient("https://gwapi.10646.cn/api/", "azjJ2*****", "c8P00UiFwiBqHHW**************")
 
 	// 设置超时时间（可选）
 	client.SetConnectTimeout(2000) // 连接超时时长设置（单位：毫秒），可以不设置，默认两秒
@@ -29,7 +29,7 @@ func main() {
 	params := map[string]interface{}{
 		"messageId": "1",
 		"version":   "V1.1",
-		"openId":    "46027ouagaXQO3R",
+		"openId":    "46027ouaga*****",
 		"iccids":    []string{"89860625680009634556"},
 	}
 	req.SetParams(params)
