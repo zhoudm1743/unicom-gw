@@ -101,4 +101,4 @@ func main() {
 
 ## 许可证
 
-本SDK采用Apache 2.0许可证。 
+本SDK采用MIT许可证。 
