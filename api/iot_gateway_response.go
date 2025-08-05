@@ -1,11 +1,17 @@
 package api
 
-// IoTGatewayResponse 定义API响应接口
+// IoTGatewayResponse 定义IoT网关响应接口
 type IoTGatewayResponse interface {
-	// GetStatus 获取状态
+	// IsSuccess 请求是否成功
+	IsSuccess() bool
+
+	// SetSuccess 设置请求是否成功
+	SetSuccess(success bool)
+
+	// GetStatus 获取状态码
 	GetStatus() string
 
-	// SetStatus 设置状态
+	// SetStatus 设置状态码
 	SetStatus(status string)
 
 	// GetMessage 获取消息
@@ -19,28 +25,32 @@ type IoTGatewayResponse interface {
 
 	// SetBody 设置响应体
 	SetBody(body string)
-
-	// IsSuccess 是否成功
-	IsSuccess() bool
-
-	// SetSuccess 设置是否成功
-	SetSuccess(success bool)
 }
 
-// BaseIoTGatewayResponse 实现IoTGatewayResponse的基础抽象类
+// BaseIoTGatewayResponse IoT网关响应基础实现
 type BaseIoTGatewayResponse struct {
-	Status    string `json:"status"`
-	Message   string `json:"message"`
-	Body      string `json:"-"`
-	IsSucceed *bool  `json:"-"`
+	Status  string
+	Message string
+	Body    string
+	IsSucc  bool
 }
 
-// GetStatus 获取状态
+// IsSuccess 请求是否成功
+func (r *BaseIoTGatewayResponse) IsSuccess() bool {
+	return r.IsSucc
+}
+
+// SetSuccess 设置请求是否成功
+func (r *BaseIoTGatewayResponse) SetSuccess(success bool) {
+	r.IsSucc = success
+}
+
+// GetStatus 获取状态码
 func (r *BaseIoTGatewayResponse) GetStatus() string {
 	return r.Status
 }
 
-// SetStatus 设置状态
+// SetStatus 设置状态码
 func (r *BaseIoTGatewayResponse) SetStatus(status string) {
 	r.Status = status
 }
@@ -63,17 +73,4 @@ func (r *BaseIoTGatewayResponse) GetBody() string {
 // SetBody 设置响应体
 func (r *BaseIoTGatewayResponse) SetBody(body string) {
 	r.Body = body
-}
-
-// IsSuccess 是否成功
-func (r *BaseIoTGatewayResponse) IsSuccess() bool {
-	if r.IsSucceed != nil {
-		return *r.IsSucceed
-	}
-	return false
-}
-
-// SetSuccess 设置是否成功
-func (r *BaseIoTGatewayResponse) SetSuccess(success bool) {
-	r.IsSucceed = &success
 }

@@ -1,6 +1,6 @@
 package api
 
-// IoTGatewayRequest 定义API请求接口
+// IoTGatewayRequest 定义IoT网关请求接口
 type IoTGatewayRequest interface {
 	// GetContentType 获取内容类型
 	GetContentType() string
@@ -14,29 +14,32 @@ type IoTGatewayRequest interface {
 	// GetReqText 获取请求文本
 	GetReqText() string
 
-	// GetParams 获取所有的Key-Value形式的文本请求参数集合
-	// Key: 请求参数名
-	// Value: 请求参数值
+	// GetParams 获取请求参数
 	GetParams() map[string]interface{}
 
-	// GetResponseClass 获取具体响应实现类的定义
-	GetResponseClass() interface{}
+	// GetResponseClass 获取响应类型
+	GetResponseClass() IoTGatewayResponse
 
 	// Check 客户端参数检查，减少服务端无效调用
 	Check() error
 
 	// ExecProcessBeforeReqSend 请求发送前的处理
 	ExecProcessBeforeReqSend(params []interface{})
+
+	// GetTransId 获取交易ID
+	GetTransId() string
+
+	// SetTransId 设置交易ID
+	SetTransId(transId string)
 }
 
-// BaseIoTGatewayRequest 实现IoTGatewayRequest的基础抽象类
+// BaseIoTGatewayRequest IoT网关请求基础实现
 type BaseIoTGatewayRequest struct {
-	ApiName  string
-	ApiVer   string
-	ApiType  string
-	ReqText  string
-	TransId  string
-	Response IoTGatewayResponse
+	ApiName string
+	ApiVer  string
+	ApiType string
+	ReqText string
+	TransId string
 }
 
 // GetContentType 获取内容类型
