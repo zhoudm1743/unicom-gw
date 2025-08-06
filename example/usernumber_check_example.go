@@ -11,11 +11,7 @@ import (
 
 func main() {
 	// 创建客户端实例
-<<<<<<< HEAD
-	client := api.NewIoTGatewayClient("https://gwapi.10646.cn/api/", "azjJ2DKEhQ", "c8P00UiFwiBqHHWxU1iSV1ok0iCwUY", "46027ouagaXQO3R")
-=======
-	client := api.NewIoTGatewayClient("https://gwapi.10646.cn/api/", "azjJ2*****", "c8P00UiFwiBqHHW**************")
->>>>>>> d28262253b4a80b289ec651abeb45ad231e62b3d
+	client := api.NewIoTGatewayClient("https://gwapi.10646.cn/api/", "azjJ2*****", "c8P00UiFwiBqHHWxU1iSV1********", "46027ouaga*****")
 
 	// 设置超时时间（可选）
 	client.SetConnectTimeout(2000) // 连接超时时长设置（单位：毫秒），可以不设置，默认两秒
