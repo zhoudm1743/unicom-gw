@@ -38,6 +38,12 @@ type IoTGatewayClient interface {
 
 	// SetRetryCount 设置重试次数
 	SetRetryCount(retryCount int)
+
+	// GetOpenID 获取openID
+	GetOpenID() string
+
+	// SetOpenID 设置openID
+	SetOpenID(openID string)
 }
 
 // DefaultIoTGatewayClient 默认IoT网关客户端实现
@@ -45,17 +51,19 @@ type DefaultIoTGatewayClient struct {
 	ServerURL      string
 	AppID          string
 	AppSecret      string
+	OpenID         string
 	ConnectTimeout int
 	ReadTimeout    int
 	RetryCount     int
 }
 
 // NewIoTGatewayClient 创建一个新的IoT网关客户端
-func NewIoTGatewayClient(serverURL, appID, appSecret string) *DefaultIoTGatewayClient {
+func NewIoTGatewayClient(serverURL, appID, appSecret, openID string) *DefaultIoTGatewayClient {
 	return &DefaultIoTGatewayClient{
 		ServerURL:      serverURL,
 		AppID:          appID,
 		AppSecret:      appSecret,
+		OpenID:         openID,
 		ConnectTimeout: 2000,  // 默认连接超时2秒
 		ReadTimeout:    30000, // 默认读取超时30秒
 		RetryCount:     0,     // 默认不重试
@@ -174,4 +182,14 @@ func (c *DefaultIoTGatewayClient) GetRetryCount() int {
 // SetRetryCount 设置重试次数
 func (c *DefaultIoTGatewayClient) SetRetryCount(retryCount int) {
 	c.RetryCount = retryCount
+}
+
+// GetOpenID 获取openID
+func (c *DefaultIoTGatewayClient) GetOpenID() string {
+	return c.OpenID
+}
+
+// SetOpenID 设置openID
+func (c *DefaultIoTGatewayClient) SetOpenID(openID string) {
+	c.OpenID = openID
 }

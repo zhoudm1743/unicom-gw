@@ -16,6 +16,7 @@ const (
 	TimestampKey = "timestamp"
 	TokenKey     = "token"
 	AppSecretKey = "app_secrect"
+	OpenIDKey    = "openId"
 )
 
 // BuildAppParams 构建应用参数
